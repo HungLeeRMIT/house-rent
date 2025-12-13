@@ -1,0 +1,17 @@
+{
+  "properties": [
+    {
+      "name": "spring.devtools.restart.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable automatic restart.",
+      "defaultValue": true
+    },
+    {
+      "name": "spring.devtools.livereload.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable LiveReload server.",
+      "defaultValue": true
+    }
+  ]
+}
+

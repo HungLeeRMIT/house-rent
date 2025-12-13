@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: rentmate-backend
+  
+  datasource:
+    url: jdbc:mysql://localhost:3306/rentmate?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+  
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  
+  # DevTools Configuration (for auto-reload)
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java,src/main/resources
+      exclude: static/**,public/**,templates/**
+    livereload:
+      enabled: true
+    add-properties: true
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+jwt:
+  secret: ${JWT_SECRET:rentmate-super-secret-key-change-in-production}
+  expiration: 86400000 # 24 hours in milliseconds
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.rentmate: DEBUG
+    org.springframework.security: DEBUG

@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # MySQL Database for development
+  mysql:
+    image: mysql:8.0
+    container_name: rentmate-mysql-dev
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: rentmate_dev
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: rentmate
+      MYSQL_PASSWORD: rentmate123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-dev-data:/var/lib/mysql
+    networks:
+      - rentmate-dev-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql-dev-data:
+    driver: local
+
+networks:
+  rentmate-dev-network:
+    driver: bridge
+

@@ -1,0 +1,248 @@
+.property-details-page {
+  padding: 40px 0;
+  min-height: calc(100vh - 70px);
+}
+
+.back-btn {
+  margin-bottom: 20px;
+}
+
+.property-details-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.property-header {
+  width: 100%;
+}
+
+.property-image-gallery {
+  width: 100%;
+}
+
+.property-main-image {
+  height: 500px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 96px;
+  position: relative;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  overflow: hidden;
+}
+
+.property-main-image:hover {
+  opacity: 0.95;
+}
+
+.property-main-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.property-image-thumbnails {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 8px;
+  background: #f8fafc;
+}
+
+.image-thumbnail {
+  height: 120px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+  opacity: 0.7;
+  overflow: hidden;
+}
+
+.image-thumbnail:hover {
+  transform: scale(1.05);
+  opacity: 1;
+}
+
+.property-type-badge-large {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.availability-badge-large {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 8px 16px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.property-info {
+  padding: 40px;
+}
+
+.property-main-info {
+  margin-bottom: 30px;
+}
+
+.property-title-large {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--dark-text);
+}
+
+.property-location-large {
+  font-size: 18px;
+  color: var(--gray-text);
+  margin-bottom: 20px;
+}
+
+.property-price-large {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.property-features {
+  display: flex;
+  gap: 40px;
+  padding: 30px 0;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 30px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.feature-icon {
+  font-size: 32px;
+}
+
+.feature-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--dark-text);
+}
+
+.feature-label {
+  font-size: 14px;
+  color: var(--gray-text);
+}
+
+.property-description {
+  margin-bottom: 30px;
+}
+
+.property-description h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--dark-text);
+}
+
+.property-description p {
+  color: var(--gray-text);
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+.property-actions {
+  display: flex;
+  gap: 16px;
+  padding-top: 30px;
+  border-top: 1px solid var(--border-color);
+}
+
+.loading {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.loading-spinner {
+  border: 4px solid var(--border-color);
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.empty-state h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--dark-text);
+  margin-bottom: 12px;
+}
+
+.empty-state p {
+  color: var(--gray-text);
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.landlord-info {
+  background: var(--light-bg);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.landlord-info h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--dark-text);
+  margin-bottom: 12px;
+}
+
+.landlord-info p {
+  color: var(--gray-text);
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.landlord-info strong {
+  color: var(--dark-text);
+  font-weight: 600;
+}
+

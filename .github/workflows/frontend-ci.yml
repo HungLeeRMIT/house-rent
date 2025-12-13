@@ -1,0 +1,113 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'frontend/**'
+
+jobs:
+  build-and-test:
+    name: Build and Test Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    - name: Run linter
+      working-directory: ./frontend
+      run: npm run lint
+      continue-on-error: true
+
+    - name: Run tests
+      working-directory: ./frontend
+      run: npm run test
+      continue-on-error: true
+
+    - name: Build application
+      working-directory: ./frontend
+      run: npm run build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-build
+        path: frontend/dist
+        retention-days: 7
+
+  docker-build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker image
+      working-directory: ./frontend
+      run: docker build -t rentmate-frontend:latest .
+
+    - name: Save Docker image
+      run: docker save rentmate-frontend:latest | gzip > frontend-image.tar.gz
+
+    - name: Upload Docker image
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-docker-image
+        path: frontend-image.tar.gz
+        retention-days: 7
+
+  lighthouse-check:
+    name: Lighthouse Performance Check
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'pull_request'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    - name: Build application
+      working-directory: ./frontend
+      run: npm run build
+
+    - name: Serve and run Lighthouse
+      working-directory: ./frontend
+      run: |
+        npm install -g serve @lhci/cli
+        serve -s dist -p 3000 &
+        sleep 5
+        lhci autorun --collect.url=http://localhost:3000 || true
+      continue-on-error: true
+
