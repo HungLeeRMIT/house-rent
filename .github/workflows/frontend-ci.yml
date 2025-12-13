@@ -46,7 +46,7 @@ jobs:
       run: npm run build
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v6
       with:
         name: frontend-build
         path: frontend/dist
@@ -73,7 +73,7 @@ jobs:
       run: docker save rentmate-frontend:latest | gzip > frontend-image.tar.gz
 
     - name: Upload Docker image
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v6
       with:
         name: frontend-docker-image
         path: frontend-image.tar.gz
