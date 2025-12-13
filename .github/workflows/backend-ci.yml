@@ -51,7 +51,7 @@ jobs:
       run: mvn verify
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v6
       with:
         name: backend-jar
         path: backend/target/*.jar
@@ -99,7 +99,7 @@ jobs:
       run: docker save rentmate-backend:latest | gzip > backend-image.tar.gz
 
     - name: Upload Docker image
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v6
       with:
         name: backend-docker-image
         path: backend-image.tar.gz
