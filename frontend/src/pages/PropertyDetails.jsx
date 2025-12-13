@@ -2,7 +2,14 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { propertyAPI } from '../services/api'
 import { useAuthStore } from '../store/authStore'
-import './PropertyDetails.css'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { 
+  ArrowLeft, MapPin, Bed, Bath, Square, Calendar, Home as HomeIcon, 
+  Loader2, MessageCircle, Eye, Edit, XCircle, User, Mail, Phone 
+} from 'lucide-react'
 
 function PropertyDetails() {
   const { id } = useParams()
@@ -85,12 +92,10 @@ function PropertyDetails() {
 
   if (loading) {
     return (
-      <div className="property-details-page">
-        <div className="container">
-          <div className="loading">
-            <div className="loading-spinner"></div>
-            <p>Loading property details...</p>
-          </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading property details...</p>
         </div>
       </div>
     )
@@ -98,179 +103,280 @@ function PropertyDetails() {
 
   if (!property) {
     return (
-      <div className="property-details-page">
-        <div className="container">
-          <div className="empty-state">
-            <div className="empty-state-icon">🏠</div>
-            <h2>Property Not Found</h2>
-            <p>The property you're looking for doesn't exist or has been removed.</p>
-            <button onClick={() => navigate('/properties')} className="btn btn-primary">
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardContent className="flex flex-col items-center py-12">
+            <HomeIcon className="h-20 w-20 text-muted-foreground mb-4" />
+            <h2 className="text-2xl font-semibold mb-2">Property Not Found</h2>
+            <p className="text-muted-foreground text-center mb-6">
+              The property you're looking for doesn't exist or has been removed.
+            </p>
+            <Button onClick={() => navigate('/properties')}>
               Browse Properties
-            </button>
-          </div>
-        </div>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
-  return (
-    <div className="property-details-page">
-      <div className="container">
-        <button onClick={() => navigate(-1)} className="btn btn-secondary back-btn">
-          ← Back to Search
-        </button>
+  const isOwner = user && user.role === 'LANDLORD' && property.landlordId === user.id
 
-        <div className="property-details-card">
-          <div className="property-header">
-            <div className="property-image-gallery">
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Back Button */}
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate(-1)} 
+          className="mb-6 gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Search
+        </Button>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Image Gallery */}
+            <Card className="overflow-hidden">
               <div 
-                className="property-main-image"
+                className="h-96 bg-gradient-to-br from-primary/10 to-primary/5 relative"
                 style={{
-                  backgroundImage: property.mainImageUrl 
-                    ? `url(${property.mainImageUrl})` 
-                    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  backgroundImage: property.mainImageUrl ? `url(${property.mainImageUrl})` : undefined,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center'
                 }}
               >
                 {!property.mainImageUrl && (
-                  <div style={{ fontSize: '96px' }}>🏠</div>
+                  <div className="flex items-center justify-center h-full">
+                    <HomeIcon className="h-32 w-32 text-muted-foreground" />
+                  </div>
                 )}
-                <div className="property-type-badge-large">{property.propertyType}</div>
+                <div className="absolute top-4 left-4">
+                  <Badge className="text-base px-4 py-2">
+                    {property.propertyType}
+                  </Badge>
+                </div>
                 {property.availableFrom && (
-                  <div className="availability-badge-large">
-                    Available: {new Date(property.availableFrom).toLocaleDateString()}
+                  <div className="absolute top-4 right-4">
+                    <Badge variant="secondary" className="text-sm px-3 py-2 gap-2 bg-background/90 backdrop-blur">
+                      <Calendar className="h-4 w-4" />
+                      Available: {new Date(property.availableFrom).toLocaleDateString()}
+                    </Badge>
                   </div>
                 )}
               </div>
-              {/* Additional images */}
+
+              {/* Thumbnails */}
               {property.imageUrls && property.imageUrls.trim() && (
-                <div className="property-image-thumbnails">
+                <div className="p-4 grid grid-cols-3 gap-3">
                   {property.imageUrls.split(',').filter(url => url.trim()).slice(0, 3).map((url, index) => (
-                    <div 
+                    <div
                       key={index}
-                      className="image-thumbnail"
+                      className="h-24 rounded-lg cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
                       style={{
                         backgroundImage: `url(${url.trim()})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center'
                       }}
-                      onClick={() => {
-                        // Could implement image gallery modal here
-                        window.open(url.trim(), '_blank')
-                      }}
+                      onClick={() => window.open(url.trim(), '_blank')}
                       title="Click to view full size"
                     />
                   ))}
                 </div>
               )}
-              {(!property.imageUrls || !property.imageUrls.trim()) && (
-                <div className="property-image-thumbnails">
-                  <div className="image-thumbnail"></div>
-                  <div className="image-thumbnail"></div>
-                  <div className="image-thumbnail"></div>
-                </div>
-              )}
-            </div>
-          </div>
+            </Card>
 
-          <div className="property-info">
-            <div className="property-main-info">
-              <h1 className="property-title-large">{property.title}</h1>
-              <p className="property-location-large">
-                📍 {property.address}, {property.city}, {property.state} {property.zipCode}
-              </p>
-              <div className="property-price-large">${property.price?.toLocaleString()}/month</div>
-            </div>
-
-            <div className="property-features">
-              <div className="feature-item">
-                <span className="feature-icon">🛏️</span>
-                <div>
-                  <div className="feature-value">{property.bedrooms || 'N/A'}</div>
-                  <div className="feature-label">Bedrooms</div>
-                </div>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">🚿</span>
-                <div>
-                  <div className="feature-value">{property.bathrooms || 'N/A'}</div>
-                  <div className="feature-label">Bathrooms</div>
-                </div>
-              </div>
-              {property.squareFeet && (
-                <div className="feature-item">
-                  <span className="feature-icon">📐</span>
-                  <div>
-                    <div className="feature-value">{property.squareFeet.toLocaleString()}</div>
-                    <div className="feature-label">Sq Ft</div>
+            {/* Property Info */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="space-y-2">
+                    <CardTitle className="text-3xl">{property.title}</CardTitle>
+                    <div className="flex items-center text-muted-foreground">
+                      <MapPin className="h-4 w-4 mr-2" />
+                      <span>{property.address}, {property.city}, {property.state} {property.zipCode}</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-3xl font-bold text-primary">
+                      ${property.price?.toLocaleString()}
+                    </p>
+                    <p className="text-sm text-muted-foreground">per month</p>
                   </div>
                 </div>
-              )}
-              <div className="feature-item">
-                <span className="feature-icon">🏠</span>
-                <div>
-                  <div className="feature-value">{property.propertyType}</div>
-                  <div className="feature-label">Type</div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Features */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="flex flex-col items-center p-4 bg-muted rounded-lg">
+                    <Bed className="h-6 w-6 mb-2 text-primary" />
+                    <p className="text-2xl font-semibold">{property.bedrooms || 'N/A'}</p>
+                    <p className="text-sm text-muted-foreground">Bedrooms</p>
+                  </div>
+                  <div className="flex flex-col items-center p-4 bg-muted rounded-lg">
+                    <Bath className="h-6 w-6 mb-2 text-primary" />
+                    <p className="text-2xl font-semibold">{property.bathrooms || 'N/A'}</p>
+                    <p className="text-sm text-muted-foreground">Bathrooms</p>
+                  </div>
+                  {property.squareFeet && (
+                    <div className="flex flex-col items-center p-4 bg-muted rounded-lg">
+                      <Square className="h-6 w-6 mb-2 text-primary" />
+                      <p className="text-2xl font-semibold">{property.squareFeet.toLocaleString()}</p>
+                      <p className="text-sm text-muted-foreground">Sq Ft</p>
+                    </div>
+                  )}
+                  <div className="flex flex-col items-center p-4 bg-muted rounded-lg">
+                    <HomeIcon className="h-6 w-6 mb-2 text-primary" />
+                    <p className="text-xl font-semibold">{property.propertyType}</p>
+                    <p className="text-sm text-muted-foreground">Type</p>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {property.description && (
-              <div className="property-description">
-                <h2>Description</h2>
-                <p>{property.description}</p>
-              </div>
-            )}
+                {/* Description */}
+                {property.description && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h3 className="text-xl font-semibold mb-3">Description</h3>
+                      <p className="text-muted-foreground leading-relaxed">{property.description}</p>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </div>
 
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Landlord Info */}
             {property.landlordName && (
-              <div className="landlord-info">
-                <h3>Property Owner</h3>
-                <p><strong>Name:</strong> {property.landlordName}</p>
-                {property.landlordEmail && (
-                  <p><strong>Email:</strong> {property.landlordEmail}</p>
-                )}
-                {property.landlordPhone && (
-                  <p><strong>Phone:</strong> {property.landlordPhone}</p>
-                )}
-              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Property Owner</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <User className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">{property.landlordName}</p>
+                      <p className="text-sm text-muted-foreground">Landlord</p>
+                    </div>
+                  </div>
+                  {property.landlordEmail && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      <span>{property.landlordEmail}</span>
+                    </div>
+                  )}
+                  {property.landlordPhone && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <span>{property.landlordPhone}</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             )}
 
-            <div className="property-actions">
-              {user && user.role === 'LANDLORD' && property.landlordId === user.id ? (
-                <>
-                  <button 
-                    className="btn btn-primary btn-lg"
-                    onClick={() => navigate(`/properties/${id}/edit`)}
-                  >
-                    ✏️ Edit Property
-                  </button>
-                  <button 
-                    className="btn btn-outline btn-lg"
-                    onClick={handleUnlist}
-                    disabled={unlisting}
-                  >
-                    {unlisting ? 'Unlisting...' : '🚫 Unlist Property'}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button 
-                    className="btn btn-primary btn-lg" 
-                    onClick={handleContactLandlord}
-                    disabled={contacting}
-                  >
-                    {contacting ? 'Opening...' : '💬 Message Landlord'}
-                  </button>
-                  <button 
-                    className="btn btn-outline btn-lg"
-                    onClick={handleScheduleViewing}
-                  >
-                    📅 Schedule Viewing
-                  </button>
-                </>
-              )}
-            </div>
+            {/* Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Actions</CardTitle>
+                <CardDescription>
+                  {isOwner ? 'Manage this property' : 'Get in touch with the landlord'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {isOwner ? (
+                  <>
+                    <Button 
+                      className="w-full gap-2" 
+                      onClick={() => navigate(`/properties/${id}/edit`)}
+                    >
+                      <Edit className="h-4 w-4" />
+                      Edit Property
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full gap-2"
+                      onClick={handleUnlist}
+                      disabled={unlisting}
+                    >
+                      {unlisting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Unlisting...
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="h-4 w-4" />
+                          Unlist Property
+                        </>
+                      )}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      className="w-full gap-2"
+                      onClick={handleContactLandlord}
+                      disabled={contacting}
+                    >
+                      {contacting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Opening...
+                        </>
+                      ) : (
+                        <>
+                          <MessageCircle className="h-4 w-4" />
+                          Message Landlord
+                        </>
+                      )}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full gap-2"
+                      onClick={handleScheduleViewing}
+                    >
+                      <Eye className="h-4 w-4" />
+                      Schedule Viewing
+                    </Button>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Quick Stats */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Quick Stats</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Status</span>
+                  <Badge variant="outline" className="text-green-600 border-green-600">
+                    Available
+                  </Badge>
+                </div>
+                {property.availableFrom && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Available From</span>
+                    <span className="font-medium">
+                      {new Date(property.availableFrom).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Property Type</span>
+                  <span className="font-medium">{property.propertyType}</span>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

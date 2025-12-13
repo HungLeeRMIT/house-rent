@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
+import { ThemeProvider } from './components/ThemeProvider'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import Login from './pages/Login'
@@ -8,7 +9,6 @@ import PropertyList from './pages/PropertyList'
 import PropertyDetails from './pages/PropertyDetails'
 import PropertyForm from './pages/PropertyForm'
 import Dashboard from './pages/Dashboard'
-import './App.css'
 
 function App() {
   const { user } = useAuthStore()
@@ -21,38 +21,40 @@ function App() {
   }
 
   return (
-    <Router>
-      <div className="app">
-        <Navbar />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/properties" element={<PropertyList />} />
-            <Route path="/properties/new" element={
-              <ProtectedRoute>
-                <PropertyForm />
-              </ProtectedRoute>
-            } />
-            <Route path="/properties/:id" element={<PropertyDetails />} />
-            <Route path="/properties/:id/edit" element={
-              <ProtectedRoute>
-                <PropertyForm />
-              </ProtectedRoute>
-            } />
-            <Route 
-              path="/dashboard" 
-              element={
+    <ThemeProvider>
+      <Router>
+        <div className="min-h-screen bg-background text-foreground">
+          <Navbar />
+          <main className="pt-16">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/properties" element={<PropertyList />} />
+              <Route path="/properties/new" element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <PropertyForm />
                 </ProtectedRoute>
-              } 
-            />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+              } />
+              <Route path="/properties/:id" element={<PropertyDetails />} />
+              <Route path="/properties/:id/edit" element={
+                <ProtectedRoute>
+                  <PropertyForm />
+                </ProtectedRoute>
+              } />
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } 
+              />
+            </Routes>
+          </main>
+        </div>
+      </Router>
+    </ThemeProvider>
   )
 }
 
