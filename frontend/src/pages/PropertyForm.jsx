@@ -2,7 +2,15 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { propertyAPI } from '../services/api'
 import { useAuthStore } from '../store/authStore'
-import './PropertyForm.css'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Separator } from '@/components/ui/separator'
+import { ArrowLeft, Save, Loader2, AlertCircle, XCircle, Home as HomeIcon, MapPin, DollarSign, Image as ImageIcon } from 'lucide-react'
 
 function PropertyForm() {
   const { id } = useParams()
@@ -125,6 +133,19 @@ function PropertyForm() {
     }
   }
 
+  const handlePropertyTypeChange = (value) => {
+    setFormData(prev => ({
+      ...prev,
+      propertyType: value
+    }))
+    if (errors.propertyType) {
+      setErrors(prev => ({
+        ...prev,
+        propertyType: ''
+      }))
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -201,247 +222,392 @@ function PropertyForm() {
 
   if (loading) {
     return (
-      <div className="property-form-page">
-        <div className="container">
-          <div className="loading">Loading property...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading property...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="property-form-page">
-      <div className="container">
-        <h1 className="page-title">{isEdit ? 'Edit Property' : 'Create New Property'}</h1>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Header */}
+        <div className="mb-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/properties')} 
+            className="mb-4 gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Properties
+          </Button>
+          <h1 className="text-4xl font-bold mb-2">
+            {isEdit ? 'Edit Property' : 'Create New Property'}
+          </h1>
+          <p className="text-muted-foreground">
+            {isEdit ? 'Update your property details' : 'List a new property for rent'}
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="property-form">
-          <div className="form-section">
-            <h2>Basic Information</h2>
-            
-            <div className="form-group">
-              <label htmlFor="title">Title *</label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                className={errors.title ? 'error' : ''}
-                placeholder="e.g., Cozy 2BR Apartment in Downtown"
-              />
-              {errors.title && <span className="error-message">{errors.title}</span>}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="description">Description</label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows="4"
-                placeholder="Describe your property..."
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="address">Address *</label>
-              <input
-                type="text"
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                className={errors.address ? 'error' : ''}
-                placeholder="123 Main Street"
-              />
-              {errors.address && <span className="error-message">{errors.address}</span>}
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="city">City *</label>
-                <input
-                  type="text"
-                  id="city"
-                  name="city"
-                  value={formData.city}
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Basic Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <HomeIcon className="h-5 w-5" />
+                Basic Information
+              </CardTitle>
+              <CardDescription>Provide essential details about your property</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">
+                  Property Title <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="title"
+                  name="title"
+                  value={formData.title}
                   onChange={handleChange}
-                  className={errors.city ? 'error' : ''}
-                  placeholder="Boston"
+                  placeholder="e.g., Cozy 2BR Apartment in Downtown"
+                  className={errors.title ? 'border-destructive' : ''}
                 />
-                {errors.city && <span className="error-message">{errors.city}</span>}
+                {errors.title && (
+                  <p className="text-sm text-destructive flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.title}
+                  </p>
+                )}
               </div>
 
-              <div className="form-group">
-                <label htmlFor="state">State *</label>
-                <input
-                  type="text"
-                  id="state"
-                  name="state"
-                  value={formData.state}
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
                   onChange={handleChange}
-                  className={errors.state ? 'error' : ''}
-                  placeholder="MA"
+                  rows={4}
+                  placeholder="Describe your property, its features, and what makes it special..."
                 />
-                {errors.state && <span className="error-message">{errors.state}</span>}
+                <p className="text-xs text-muted-foreground">Optional: Help tenants understand what makes your property unique</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Location */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5" />
+                Location
+              </CardTitle>
+              <CardDescription>Where is the property located?</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="address">
+                  Street Address <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  placeholder="123 Main Street"
+                  className={errors.address ? 'border-destructive' : ''}
+                />
+                {errors.address && (
+                  <p className="text-sm text-destructive flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.address}
+                  </p>
+                )}
               </div>
 
-              <div className="form-group">
-                <label htmlFor="zipCode">Zip Code</label>
-                <input
-                  type="text"
-                  id="zipCode"
-                  name="zipCode"
-                  value={formData.zipCode}
-                  onChange={handleChange}
-                  placeholder="02101"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="city">
+                    City <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    placeholder="Boston"
+                    className={errors.city ? 'border-destructive' : ''}
+                  />
+                  {errors.city && (
+                    <p className="text-sm text-destructive flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {errors.city}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="state">
+                    State <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="state"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
+                    placeholder="MA"
+                    className={errors.state ? 'border-destructive' : ''}
+                  />
+                  {errors.state && (
+                    <p className="text-sm text-destructive flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {errors.state}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="zipCode">Zip Code</Label>
+                  <Input
+                    id="zipCode"
+                    name="zipCode"
+                    value={formData.zipCode}
+                    onChange={handleChange}
+                    placeholder="02101"
+                  />
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="form-section">
-            <h2>Property Details</h2>
+          {/* Property Details */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5" />
+                Property Details
+              </CardTitle>
+              <CardDescription>Specify pricing and property characteristics</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="price">
+                    Monthly Rent ($) <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="price"
+                    name="price"
+                    type="number"
+                    value={formData.price}
+                    onChange={handleChange}
+                    placeholder="2000"
+                    min="0"
+                    step="0.01"
+                    className={errors.price ? 'border-destructive' : ''}
+                  />
+                  {errors.price && (
+                    <p className="text-sm text-destructive flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {errors.price}
+                    </p>
+                  )}
+                </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="price">Monthly Rent ($) *</label>
-                <input
-                  type="number"
-                  id="price"
-                  name="price"
-                  value={formData.price}
-                  onChange={handleChange}
-                  className={errors.price ? 'error' : ''}
-                  placeholder="2000"
-                  min="0"
-                  step="0.01"
-                />
-                {errors.price && <span className="error-message">{errors.price}</span>}
+                <div className="space-y-2">
+                  <Label htmlFor="propertyType">
+                    Property Type <span className="text-destructive">*</span>
+                  </Label>
+                  <Select 
+                    value={formData.propertyType} 
+                    onValueChange={handlePropertyTypeChange}
+                  >
+                    <SelectTrigger className={errors.propertyType ? 'border-destructive' : ''}>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="APARTMENT">Apartment</SelectItem>
+                      <SelectItem value="HOUSE">House</SelectItem>
+                      <SelectItem value="CONDO">Condo</SelectItem>
+                      <SelectItem value="TOWNHOUSE">Townhouse</SelectItem>
+                      <SelectItem value="STUDIO">Studio</SelectItem>
+                      <SelectItem value="OTHER">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.propertyType && (
+                    <p className="text-sm text-destructive flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {errors.propertyType}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="availableFrom">
+                    Available From <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="availableFrom"
+                    name="availableFrom"
+                    type="date"
+                    value={formData.availableFrom}
+                    onChange={handleChange}
+                    className={errors.availableFrom ? 'border-destructive' : ''}
+                  />
+                  {errors.availableFrom && (
+                    <p className="text-sm text-destructive flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {errors.availableFrom}
+                    </p>
+                  )}
+                </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="propertyType">Property Type *</label>
-                <select
-                  id="propertyType"
-                  name="propertyType"
-                  value={formData.propertyType}
+              <Separator />
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="bedrooms">Bedrooms</Label>
+                  <Input
+                    id="bedrooms"
+                    name="bedrooms"
+                    type="number"
+                    value={formData.bedrooms}
+                    onChange={handleChange}
+                    placeholder="2"
+                    min="0"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="bathrooms">Bathrooms</Label>
+                  <Input
+                    id="bathrooms"
+                    name="bathrooms"
+                    type="number"
+                    value={formData.bathrooms}
+                    onChange={handleChange}
+                    placeholder="1"
+                    min="0"
+                    step="0.5"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="squareFeet">Square Feet</Label>
+                  <Input
+                    id="squareFeet"
+                    name="squareFeet"
+                    type="number"
+                    value={formData.squareFeet}
+                    onChange={handleChange}
+                    placeholder="1200"
+                    min="0"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Images */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ImageIcon className="h-5 w-5" />
+                Property Images
+              </CardTitle>
+              <CardDescription>Add photos to showcase your property</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-sm">
+                  Enter direct image URLs. Make sure the images are publicly accessible.
+                </AlertDescription>
+              </Alert>
+
+              <div className="space-y-2">
+                <Label htmlFor="mainImageUrl">Main Image URL</Label>
+                <Input
+                  id="mainImageUrl"
+                  name="mainImageUrl"
+                  type="url"
+                  value={formData.mainImageUrl}
                   onChange={handleChange}
-                  className={errors.propertyType ? 'error' : ''}
+                  placeholder="https://example.com/image.jpg"
+                  className={errors.mainImageUrl ? 'border-destructive' : ''}
+                />
+                {errors.mainImageUrl ? (
+                  <p className="text-sm text-destructive flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.mainImageUrl}
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    This will be the featured image for your property
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="imageUrls">Additional Image URLs</Label>
+                <Textarea
+                  id="imageUrls"
+                  name="imageUrls"
+                  value={formData.imageUrls}
+                  onChange={handleChange}
+                  rows={3}
+                  placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Enter comma-separated URLs for additional images
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-3 justify-between">
+            <div className="flex gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => navigate('/properties')}
+              >
+                Cancel
+              </Button>
+              {isEdit && (
+                <Button 
+                  type="button" 
+                  variant="destructive" 
+                  onClick={handleUnlist}
+                  className="gap-2"
                 >
-                  <option value="">Select type</option>
-                  <option value="APARTMENT">Apartment</option>
-                  <option value="HOUSE">House</option>
-                  <option value="CONDO">Condo</option>
-                  <option value="TOWNHOUSE">Townhouse</option>
-                  <option value="STUDIO">Studio</option>
-                  <option value="OTHER">Other</option>
-                </select>
-                {errors.propertyType && <span className="error-message">{errors.propertyType}</span>}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="availableFrom">Available From *</label>
-                <input
-                  type="date"
-                  id="availableFrom"
-                  name="availableFrom"
-                  value={formData.availableFrom}
-                  onChange={handleChange}
-                  className={errors.availableFrom ? 'error' : ''}
-                />
-                {errors.availableFrom && <span className="error-message">{errors.availableFrom}</span>}
-              </div>
+                  <XCircle className="h-4 w-4" />
+                  Unlist Property
+                </Button>
+              )}
             </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="bedrooms">Bedrooms</label>
-                <input
-                  type="number"
-                  id="bedrooms"
-                  name="bedrooms"
-                  value={formData.bedrooms}
-                  onChange={handleChange}
-                  placeholder="2"
-                  min="0"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="bathrooms">Bathrooms</label>
-                <input
-                  type="number"
-                  id="bathrooms"
-                  name="bathrooms"
-                  value={formData.bathrooms}
-                  onChange={handleChange}
-                  placeholder="1"
-                  min="0"
-                  step="0.5"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="squareFeet">Square Feet</label>
-                <input
-                  type="number"
-                  id="squareFeet"
-                  name="squareFeet"
-                  value={formData.squareFeet}
-                  onChange={handleChange}
-                  placeholder="1200"
-                  min="0"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="form-section">
-            <h2>Images</h2>
-
-            <div className="form-group">
-              <label htmlFor="mainImageUrl">Main Image URL</label>
-              <input
-                type="url"
-                id="mainImageUrl"
-                name="mainImageUrl"
-                value={formData.mainImageUrl}
-                onChange={handleChange}
-                className={errors.mainImageUrl ? 'error' : ''}
-                placeholder="https://example.com/image.jpg"
-              />
-              {errors.mainImageUrl && <span className="error-message">{errors.mainImageUrl}</span>}
-              <small className="form-hint">Enter a URL to an image</small>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="imageUrls">Additional Image URLs</label>
-              <textarea
-                id="imageUrls"
-                name="imageUrls"
-                value={formData.imageUrls}
-                onChange={handleChange}
-                rows="3"
-                placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-              />
-              <small className="form-hint">Enter comma-separated URLs for additional images</small>
-            </div>
-          </div>
-
-          <div className="form-actions">
-            <button type="button" onClick={() => navigate('/properties')} className="btn btn-secondary">
-              Cancel
-            </button>
-            {isEdit && (
-              <button type="button" onClick={handleUnlist} className="btn btn-warning">
-                Unlist Property
-              </button>
-            )}
-            <button type="submit" className="btn btn-primary" disabled={submitting}>
-              {submitting ? 'Saving...' : (isEdit ? 'Update Property' : 'Create Property')}
-            </button>
+            <Button 
+              type="submit" 
+              disabled={submitting}
+              className="gap-2"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  {isEdit ? 'Update Property' : 'Create Property'}
+                </>
+              )}
+            </Button>
           </div>
         </form>
       </div>
